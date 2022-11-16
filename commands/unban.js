@@ -1,36 +1,18 @@
-const { MessageEmbed } = require("discord.js");
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
-module.exports.config = {
-    name: "unban",
-    description: "Unban a banned user",
-    usage: '!unban [ID]',
-    botperms: ['BAN_MEMBERS'],
-    permissions: ['BAN_MEMBERS'],
-    group: 'moderation',
-    example: '!unban 941029183801393242'
-}
-
-module.exports.run = async(client, message, args) =>{ 
-    const user_id = args[0];
-    if (!user_id) return message.channel.send(client.main);
-    try {
-        client.users.fetch(user_id)
-    } catch {
-       return message.channel.send(client.noUser);
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('unban')
+        .setDescription('Unbans a user')
+        .addUserOption(option => option.setName('user').setDescription('The user to unban')),
+    async execute(interaction) {
+        const user = interaction.options.getUser('user');
+        if (user) {
+            await interaction.guild.members.unban(user.id);
+            interaction.reply(`Successfully unbanned ${user.username}`);
+        }
+        else {
+            interaction.reply('You didn\'t specify the user to unban!');
+        }
     }
-
-    const mm = await client.users.fetch(user_id)
-
-    message.guild.members.unban(user_id).then(() => {
-        const unbanned = new MessageEmbed()
-        .setColor(client.color)
-        .setDescription(`${client.success} _Successfully Unbanned ${mm.username}_`)
-        message.channel.send(unbanned);
-    }).catch((e) => {
-      //  console.log(e)
-        const failed = new MessageEmbed()
-        .setColor(client.color)
-        .setDescription(`${client.fail} _Failed to unban ${mm.username}_`)
-        message.channel.send(failed);
-    })
-}
+};

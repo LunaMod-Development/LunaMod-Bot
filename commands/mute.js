@@ -1,105 +1,39 @@
-const ms = require('ms')
-const { Client, Message, MessageEmbed } = require('discord.js');
-const fs =require('fs')
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
-module.exports.config = {
-    name: "mute",
-    aliases: ['m'],
-    permissions: ['MANAGE_MESSAGES'],
-    guildOnly: true,
-    group: 'moderation',
-    botperms: ['EMBED_LINKS'],
-    description: "Mute a user",
-    usage: '!mute [@user] [time]',
-    example: '!mute @Slayer#0000 10m',
-}
-
-/**
- * 
- * @param {Client} client 
- * @param {Message} message 
- * @param {*} args 
- */
-
-module.exports.run = async(client, message, args) => {
-    const userInput = message.mentions.members.last() ? message.mentions.members.last() : args[0]
-
-    let mm ;
-    try {
-    if (userInput === args[0]) mm = await message.guild.members.fetch(args[0]); else mm = await message.mentions.members.last();
-    } catch {
-
-    }
-    if (!mm) return message.channel.send(client.noMember);
-
-    if (mm.id === client.user.id) return message.channel.send(client.main);
-
-    let muteRole = require('../database/muterole.json')[message.guild.id].role;
-
-    if (!require('../database/muterole.json')[message.guild.id]) {
-        return message.channel.send(client.noMuteRole);
-    }
-    const time = args[1];
-    if (!time) return message.channel.send(client.main);
-
-    try {
-        await message.guild.roles.fetch(muteRole)
-    } catch {
-        return message.channel.send(this.muteRoleInvalid)
-    }
-    let mRoleFetch = await message.guild.roles.fetch(muteRole);
-
-
-    try {
-    if (mRoleFetch.position >= message.guild.me.roles.highest.position) {
-        return message.channel.send(client.roleHigherThanMe)
-    }
-} catch {
-
-}
-
-const Muted = new MessageEmbed()
-.setColor(client.color)
-.setDescription(`${client.success} _\`${mm.user.username}\` has been muted_ `)
-
-    mm.roles.add(muteRole).then(() => {
-
-        const userLogs = require('../database/userlogs.json')
-
-    if (!userLogs[mm.id]) {
-        userLogs[mm.id] = {};
-        fs.writeFile('./database/userlogs.json', JSON.stringify(userLogs), (err) => {
- 
-        })
-        if (!userLogs[mm.id][message.guild.id]) {
-            userLogs[mm.id][message.guild.id] = {};
-            fs.writeFile('./database/userlogs.json', JSON.stringify(userLogs), (err) => {
-            
-            })
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('mute')
+        .setDescription('Mutes a user')
+        .addUserOption(option => option.setName('user').setDescription('The user to mute'))
+        .addStringOption(option => option.setName('reason').setDescription('The reason for muting the user')),
+    async execute(interaction, client) {
+        const user = interaction.options.getUser('user');
+        const reason = interaction.options.getString('reason');
+        if (user) {
+            if (reason) {
+                const guild = interaction.guild;
+                const guildId = guild.id;
+                const guildDoc = await client.db.guilds.findOne
+                if (guildDoc) {
+                    const mutedRole = guild.roles.cache.find(role => role.name === 'Muted');
+                    if (mutedRole) {
+                        await guild.members.cache.get(user.id).roles.add(mutedRole);
+                        interaction.reply(`Successfully muted ${user.username} for ${reason}`);
+                    }
+                    else {
+                        interaction.reply('The Muted role doesn\'t exist!');
+                    }
+                }
+                else {
+                    interaction.reply('This server isn\'t in the database!');
+                }
+            }
+            else {
+                interaction.reply('You didn\'t specify the reason!');
+            }
+        }
+        else {
+            interaction.reply('You didn\'t specify the user to mute!');
         }
     }
- 
-    if (!userLogs[mm.id][message.guild.id].logs) {
-        userLogs[mm.id][message.guild.id] = {
-            logs: 0
-        };
-        fs.writeFile('./database/userlogs.json', JSON.stringify(userLogs), (err) => {
-            
-        })
-    }
- 
-    userLogs[mm.id][message.guild.id].logs++
- 
- 
-       fs.writeFile('./database/userlogs.json', JSON.stringify(userLogs), (err) => {
-            
-        })
-
-
-        message.channel.send(Muted);
-        setTimeout(() => {
-            mm.roles.remove(muteRole)
-        }, ms(time))
-    })
-
-}
+};

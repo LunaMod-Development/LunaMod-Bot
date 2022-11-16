@@ -1,24 +1,16 @@
-const { MessageEmbed } = require("discord.js");
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
-module.exports.config = {
-    name: "snipe",
-    group: 'misc',
-    botpermissions: ['EMBED_LINKS'],
-    usage: `!snipe`,
-    example: `!snipe`,
-    description: "Gets most recent deleted message",
-    guildOnly: true
-}
-
-module.exports.run = async(client, message, args) => {
-    const msg = await client.snipes.get(message.channel.id);
-    if (!msg) return message.channel.send(client.noSnipes);
-
-    const embed = new MessageEmbed()
-    .setColor(client.color)
-    .setAuthor(msg.author.username, msg.author.displayAvatarURL())
-    .setDescription(msg.content)
-    .setTimestamp()
-
-    message.channel.send(embed);
-}
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('snipe')
+        .setDescription('Snipes the last deleted message'),
+    async execute(interaction) {
+        const snipedMessage = interaction.client.snipedMessages.get(interaction.channelId);
+        if (snipedMessage) {
+            await interaction.reply(`The last deleted message was: ${snipedMessage.content}`);
+        }
+        else {
+            await interaction.reply('There are no deleted messages in this channel!');
+        }
+    }
+};

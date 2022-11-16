@@ -1,38 +1,25 @@
-module.exports.config  = {
-    name: "roleinfo",
-    description: 'Get information about a role',
-    botperms: ['EMBED_LINKS'],
-    aliases: ['role-info', 'role-information', 'roleinformation'],
-    usage: '!roleinfo [@role]',
-    example: '!roleinfo @Community',
-    group: 'misc'
-}
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
-const { MessageEmbed } = require('discord.js')
-
-module.exports.run = async(client, message, args) =>{
-    const target = message.mentions.roles.first();
-
-        
-    if (!target) return message.channel.send(client.main);
-    let roleP = target.permissions.toArray().join(" ")
-    if (roleP.length > 4) roleP = 'Too many to show'
-const embed = new MessageEmbed()
-.setColor(client.color)
-.setAuthor(message.author.tag, message.author.displayAvatarURL())
-.setDescription(`Role info for: \`${target.name}\``)
-.addField("Role name:", `${target.name}`, true)
-.addField("Role color:", `${target.color}`, true)
-.addField('Role hex color:', target.hexColor, true)
-.addField("Mention:", `<@&${target.id}>`, true)
-.addField('Created AT', target.createdAt.toLocaleTimeString(), true)
-.addField("Role ID:", target.id, true)
-.addField("Role position", target.position, true)
-.addField("Role permissions", roleP || "No permissions", true)
-.addField('Role Hoist', target.hoist, true)
-.addField("Role Mentionable", target.mentionable, true)
-.addField("Role Editable", target.editable, true)
-.addField("Role managed", target.managed, true)
-message.channel.send(embed)
-
-}
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('roleinfo')
+        .setDescription('Shows Information about the role')
+        .addRoleOption(option => option.setName('role').setDescription('The role to get info about').setRequired(true)),
+    async execute(interaction, client) {
+        const role = interaction.options.getRole('role');
+        const embed = new MessageEmbed()
+            .setAuthor(interaction.guild.name, interaction.guild.iconURL())
+            .setColor(role.hexColor)
+            .addField('Name', role.name, true)
+            .addField('ID', role.id, true)
+            .addField('Hex', role.hexColor, true)
+            .addField('Members', role.members.size, true)
+            .addField('Position', role.position, true)
+            .addField('Mentionable', role.mentionable ? 'Yes' : 'No', true)
+            .addField('Hoisted', role.hoist ? 'Yes' : 'No', true)
+            .addField('Created At', role.createdAt.toDateString(), false)
+            .setTimestamp()
+            .setFooter(`${interaction.user.username}`, interaction.user.displayAvatarURL());
+        interaction.reply({ embeds: [embed] });
+    }
+};

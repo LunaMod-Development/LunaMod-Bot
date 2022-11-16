@@ -1,61 +1,43 @@
-const { Client, Message, MessageEmbed, MessageAttachment } = require("discord.js");
-const { inspect } = require("util");
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const vm = require('vm');
 
-module.exports.config = {
-    name: "eval",
-    group: "owners",
-    ownerOnly: true,
-    guarded: true,
-    usage: '.eval <code>',
-    example: '!eval console.log("Hello world")'
-}
-
-/**
- * 
- * @param {Client} client 
- * @param {Message} message 
- * @param {*} args 
- */
-
-module.exports.run = async (client, message, args) => {
-    if (!args[0]) return message.channel.send(client.main);
-    let code = args.join(' ')
-    code = code.replace(/[""]/g, '"').replace(/['']/g, "'")
-
-    let evaled;
-    try {
-        const start = process.hrtime()
-        evaled = eval(code);
-        if (evaled instanceof Promise) {
-            evaled = await eval
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('eval')
+        .setDescription('Evaluates JavaScript code')
+        .addStringOption(option => option.setName('code').setDescription('The code to evaluate')),
+    async execute(interaction) {
+        const code = interaction.options.getString('code');
+        const sandbox = {
+            interaction: interaction,
+            client: interaction.client,
+            require: require,
+            console: console,
+            process: process,
+            Buffer: Buffer,
+            setTimeout: setTimeout,
+            clearTimeout: clearTimeout,
+            setInterval: setInterval,
+            clearInterval: clearInterval,
+            setImmediate: setImmediate,
+            clearImmediate: clearImmediate,
+            __dirname: __dirname,
+            __filename: __filename,
+            module: module,
+            exports: exports,
+            global: global
+        };
+        const context = vm.createContext(sandbox);
+        let result;
+        try {
+            result = vm.runInContext
+                ? vm.runInContext(code, context)
+                : vm.runInNewContext
+                    ? vm.runInNewContext(code, context) : vm.run(code, context);
         }
-        const stop = process.hrtime(start);
-        let response = [
-            `**OutPut: \`\`\`js\n${(inspect(evaled, {depth: 0}))}\n\`\`\``
-        //, `**Type:** \`\`\`ts\n${new Type(evaled).is}\n\`\`\``
-        , `**Time taken: \`\`\`${(((stop[0] * 1e9) + stop[1])) / 1e6}ms \`\`\``
-    ]
-    const res = response.join('\n')
-    if (res.length < 2000) {
-        await message.channel.send(res)
-    } else {
-        const output = new MessageAttachment(Buffer.from(res), 'output.txt');
-        await message.channel.send(output);
-        
-    }
-    } catch (error) {
-        console.log(error)
-        message.reply('I cannot execute that command!')
-    }
-   /**
-    *  function clean(text) {
-        if (typeof text === 'string') {
-            text = text
-            .replace(/` /g, `\`${String.fromCharCode(8203)}`)
-            .replace(/@/g, `@${String.fromCharCode(8203)}`)
-            .replace(new RegExp(client.token, 'gi'), '****')
+        catch (error) {
+            result = error;
         }
-        return text
+        await interaction.reply(`\`\`\`js\n${result}\n\`\`\``);
     }
-    */
-}
+};
