@@ -1,66 +1,38 @@
-const { MessageEmbed } = require("discord.js")
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
-module.exports.config = {
-    name: "settings",
-   // aliases: ['settings'],
-    group: 'management',
-    description: "View all configuration settings",
-    usage: '!config',
-    example: '!config'
-}
-
-module.exports.run = async(client, message, args) => {
-
-    let modLogsChannel = 'None';
-
-    let modlogs = require('../database/modlogs.json')[message.guild.id];
-    if (modlogs) {
-        modLogsChannel = `<#${modlogs.channel}>`;
-    }
-
-    let mRole = 'None';
-
-    let muteRole = require('../database/muterole.json')[message.guild.id];
-    if (muteRole) {
-        mRole = `<@&${muteRole.role}>`
-    }
-
-    let serverPrefix = client.prefix;
-
-    let anti_bot = '`Disabled`'
-
-    let antibot = require('../database/antibot.json')[message.guild.id];
-    if (antibot) {
-        anti_bot = `\`${antibot.func}\``
-    };
-
-
-    const em = new MessageEmbed()
-    .setColor(client.color)
-    .setDescription(`Configuration settings for **${message.guild.name}** \n \n `)
-    .addFields(
-        {
-            name: 'Mod-logs',
-            value: modLogsChannel
-            , inline: true
-        },
-        {
-            name: 'Mute Role',
-            value: mRole,
-            inline: true
-        },
-        {
-            name: 'Server Prefix',
-            value: '`'+ serverPrefix + '`',
-            inline: true
-        },
-        {
-            name: 'Anti-Bot',
-            value: anti_bot,
-            inline: true
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('settings')
+        .setDescription('Changes the settings of the bot')
+        .addSubcommand(subcommand => subcommand
+            .setName('prefix')
+            .setDescription('Changes the prefix of the bot')
+            .addStringOption(option => option.setName('prefix').setDescription('The new prefix of the bot')))
+        .addSubcommand(subcommand => subcommand
+            .setName('language')
+            .setDescription('Changes the language of the bot')
+            .addStringOption(option => option.setName('language').setDescription('The new language of the bot'))),
+    async execute(interaction, client) {
+        const subcommand = interaction.options.getSubcommand();
+        if (subcommand === 'prefix') {
+            const prefix = interaction.options.getString('prefix');
+            if (prefix) {
+                client.prefix = prefix;
+                interaction.reply(`Successfully changed the prefix to ${prefix}`);
+            }
+            else {
+                interaction.reply('You didn\'t specify the new prefix!');
+            }
         }
-    )
-
-    message.channel.send(em)
-
-}
+        else if (subcommand === 'language') {
+            const language = interaction.options.getString('language');
+            if (language) {
+                client.language = language;
+                interaction.reply(`Successfully changed the language to ${language}`);
+            }
+            else {
+                interaction.reply('You didn\'t specify the new language!');
+            }
+        }
+    }
+};

@@ -1,78 +1,30 @@
-const { MessageEmbed, Collection } = require('discord.js');
-const fs = require('fs')
-module.exports.config = {
-    name: "disable",
-    guarded: true,
-    description: "Disable a enabled command",
-    permissions: ["MANAGE_GUILD"],
-    group: 'config',
-    aliases: ['disable-cmd'],
-    example: '!enable ban',
-    usage: '!isable <command>',
-    botperms: ["EMBED_LINKS"],
-    guildOnly: true
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
-}
-
-module.exports.run = async (client, message, args) => {
-    const command = args[0];
-
-    if (!command) return message.channel.send(client.main);
-
-
-
-    if (!client.commands.has(command)) {
-        var cantFind = new MessageEmbed()
-            .setColor(client.color)
-            .setDescription(`${client.fail} No such command as \`${command}\``)
-        // if (!client.commands.get(client.aliases.get(command))) {
-        message.channel.send(cantFind);
-        return;
-        // };
-    };
-    let cmd = client.commands.get(command);
-    //  if (require('../database/enables.json')[command]) {
-    //  };
-
-
-
-    if (require('../database/enables.json')[command]) {
-        if (require('../database/enables.json')[command][message.guild.id] === true) {
-            return message.channel.send(client.alreadyDisabled);
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('disable')
+        .setDescription('Disables a command')
+        .addStringOption(option => option.setName('command').setDescription('The command to disable')),
+    async execute(interaction, client) {
+        const command = interaction.options.getString('command');
+        if (command) {
+            const cmd = client.commands.get(command);
+            if (cmd) {
+                if (cmd.data.defaultPermission) {
+                    cmd.data.setDefaultPermission(false);
+                    client.commands.set(cmd.data.name, cmd);
+                    interaction.reply(`Successfully disabled command ${command}`);
+                }
+                else {
+                    interaction.reply('That command is already disabled!');
+                }
+            }
+            else {
+                interaction.reply('That command doesn\'t exist!');
+            }
+        }
+        else {
+            interaction.reply('You didn\'t specify the command to disable!');
         }
     }
-
-    if (cmd.config.guarded) {
-        if (cmd.config.guarded === true) {
-            return message.channel.send(client.guarded);
-        }
-    }
-
-    const file = require('../database/enables.json');
-
-    if (!file[command]) {
-        file[command] = {}
-        fs.writeFile('./database/enables.json', JSON.stringify(file, null, 2), (err) => {
-
-        })
-    }
-
-    file[command][message.guild.id] = true;
-
-    fs.writeFile('./database/enables.json', JSON.stringify(file, null, 2), (err) => {
-        if (err) {
-
-        }
-    })
-
-    let done = new MessageEmbed()
-        .setColor(client.color)
-        .setDescription(`${client.success} The ${command} command has been disabled`);
-
-    message.channel.send(done);
-
-
-
-
-
-}
+};
