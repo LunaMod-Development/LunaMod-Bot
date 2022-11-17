@@ -124,6 +124,7 @@ module.exports.run = async(client, message, args) =>{
                     inline: true
                 }
             )
+      .setTimestamp()
         //    }
         message.channel.send(e)
     }

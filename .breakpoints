@@ -1,11 +1,19 @@
 {
   "files": {
+    "commands/nuke.js": [
+      {
+        "id": "ef897137-55e0-488c-ae43-7072029bbb8b",
+        "line": 17,
+        "version": 163,
+        "index": 468
+      }
+    ],
     "index.js": [
       {
         "id": "11235ed7-07aa-423d-bf14-6cfab84c0ee8",
-        "line": 4,
-        "version": 248,
-        "index": 109
+        "line": 5,
+        "version": 52,
+        "index": 166
       }
     ]
   }

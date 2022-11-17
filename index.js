@@ -1,3 +1,4 @@
+const { SlashCommandBuilder } = require('discord.js');
 const mySecret = process.env['TOKEN']
 const { Client } = require('discord.js');
 const client = new Client();
@@ -17,6 +18,7 @@ require('./utils/handlers/handler')(client, message)
 client.on('messageUpdate', (o, message) => {
 require('./utils/handlers/editHandles')(client, message);
 })
+
 
 
 client.login(process.env.TOKEN);

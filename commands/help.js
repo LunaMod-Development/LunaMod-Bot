@@ -45,22 +45,22 @@ ${pu.config.name ? `**Name:** ${pu.config.name}` : ""}${pu.config.description ? 
         .setTitle("Help Page")
         .setThumbnail(client.user.displayAvatarURL())
         .setDescription(`Type \`help [command]\` for help with a command \n\n \<:luna_moderation:1041399635509514381> ${client.prefix}help moderation - **Moderator Commands.** \n \<:luna_management:1041399543637487757> ${client.prefix}help management - **Management Commands**  \n \<:luna_misc:1041406063070687283> ${client.prefix}help misc - **Misc Commands.** \n \<:luna_info:1041402327267020900> ${client.prefix}help info - **Shows information commands.**  \n \<:luna_settings:1041399703977345145> ${client.prefix}help config - **Shows all config setting commands**`, true)
-        .setFooter(`${message.author.tag}`, message.author.displayAvatarURL())
-    message.channel.send(embed)
-    };
-
+        .setFooter(`${message.author.tag}`, 
+         message.author.displayAvatarURL())
+         message.author.send(embed)
+         message.channel.send(`${message.author}, you should check your **direct messages**! \<:luna_success:1040969610901598268>`)
+  };
      if (args[0] === 'misc') {
          let misc = [];
 
          client.commands.forEach((command) => {
-            if (command.config.group === 'misc') misc.push(`\`${command.config.name}\` - ${command.config.description}`);
+            if (command.config.group === 'misc') 
+            misc.push(`\`${command.config.name}\` - ${command.config.description}`);
         })
         const miscEmbed = new MessageEmbed()
         .setColor(client.color)
         .setDescription(`**_Misc Commands_** \n\n ${misc.join('\n')}`)
-
-        message.channel.send(miscEmbed);
-
+        message.author.send(miscEmbed);
      }
 
      if (args[0] === 'management') {
@@ -74,7 +74,7 @@ ${pu.config.name ? `**Name:** ${pu.config.name}` : ""}${pu.config.description ? 
        .setColor(client.color)
        .setDescription(`**_Management Commands_** \n\n ${mnge.join('\n')}`)
 
-       message.channel.send(managementEmbed);
+       message.author.send(managementEmbed);
      }
 
 
@@ -89,7 +89,7 @@ ${pu.config.name ? `**Name:** ${pu.config.name}` : ""}${pu.config.description ? 
         .setColor(client.color)
         .setDescription(`**_Config Commands_** \n\n ${configuration.join('\n')}`)
 
-        message.channel.send(configEmbed);
+        message.author.send(configEmbed);
 
         }
 
@@ -102,7 +102,7 @@ ${pu.config.name ? `**Name:** ${pu.config.name}` : ""}${pu.config.description ? 
         .setColor(client.color)
         .setDescription(`**_Info Commands_** \n\n ${infoo.join('\n')}`)
 
-        message.channel.send(infoEmbed);
+        message.author.send(infoEmbed);
     }
     if (args[0] === 'moderation') {
         let mod = [];
@@ -116,6 +116,6 @@ ${pu.config.name ? `**Name:** ${pu.config.name}` : ""}${pu.config.description ? 
         .setColor(client.color)
         .setDescription(`**_Moderation Commands_** \n\n ${mod.join('\n')}`)
 
-        message.channel.send(modEmbed);
+        message.author.send(modEmbed);
     }
 }

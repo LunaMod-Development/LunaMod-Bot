@@ -25,7 +25,7 @@ module.exports.run = async(client, message, args) => {
     
         const  e = await new MessageEmbed()
         .setColor(client.color)
-        .setDescription(`${mm.username}'s avatar!`)
+        .setDescription(`**${mm.username}**'s __avatar__!`)
         .setImage(mm.displayAvatarURL({dynamic: true}))    
         await message.channel.send(e)
         } catch  {
@@ -35,9 +35,10 @@ module.exports.run = async(client, message, args) => {
 
     const embed = new MessageEmbed()
     .setColor(client.color)
-    .setDescription(`${user.username}'s avatar!`)
+    .setTitle(`You requested **${user.username}**'s avatar!`)
+    .setDescription(`**${user.username}**'s __avatar__! ˇˇ`)
     .setImage(user.displayAvatarURL({dynamic: true}))
 
     message.channel.send(embed);
-};
-}
+  };
+ }

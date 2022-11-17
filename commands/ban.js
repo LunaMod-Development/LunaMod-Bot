@@ -1,6 +1,8 @@
-const { Message, Client, MessageEmbed } = require("discord.js");
-const fs = require('fs')
-module.exports.config = {
+ const { Message, Client, MessageEmbed } = 
+ require("discord.js");
+ const fs = require('fs')
+
+ module.exports.config = {
     name: "ban",
     aliases: ['b'],
     usage: "!ban [@user] <reason>",
@@ -46,7 +48,7 @@ module.exports.run = async(client, message, args) => {
        return message.channel.send(client.higherRole);
        }
     }
-   if (mm.hasPermission('MANAGE_MESSAGES')) return message.channel.send(client.userstaff);
+   if (mm.hasPermission('BAN_MEMBERS')) return message.channel.send(client.userstaff);
     }
 
    message.guild.members.ban(mm.id, {reason: reason}).then(() => {
