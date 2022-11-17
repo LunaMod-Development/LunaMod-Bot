@@ -1,6 +1,6 @@
 # LunaMod-Bot
 
-LunaMod is a Discord moderation bot written in JavaScript using the [Discord.js](https://discord.js.org) library. LunaMod is currently in development and is not yet ready for use.
+LunaMod is a Discord moderation bot written in JavaScript using the [Discord.js](https://discord.js.org) library (version 14). LunaMod is currently in development and is not yet ready for use.
 
 ## Contributing Guidelines
 
