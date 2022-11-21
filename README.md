@@ -14,8 +14,9 @@ LunaMod requires Node.js v19.0.0 to run. If you don't have it installed, you can
 
 1. Clone the repository
 2. Install the dependencies with `npm install`
-3. Rename `config.example.json` to `config.json` and edit it to your liking
-4. Run the bot with `npm start`
+3. Get into the shell and do 'kill 1'
+4. Create an .env file and add ur bot token to it.
+5. Run the bot with npm start
 
 ## License
 
