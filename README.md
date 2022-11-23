@@ -25,4 +25,4 @@ This project uses the [MIT License](LICENSE).
 ## Credits
 
 LunaMod is written by [KylePrograms2by2](https://github.com/KylePrograms2by2).
-The commands for this bot are written by [Shawn Bragdon](https://github.com/shawnjb).
+The /commands for this bot are written by [Shawn Bragdon](https://github.com/shawnjb).
